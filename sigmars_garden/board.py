@@ -27,6 +27,13 @@ class Hex:
     
     def __sub__(self, other: Hex) -> Hex:
         return Hex(self.q - other.q, self.r - other.r)
+    
+    def distance(self, other: Hex) -> int:
+        d = self - other
+        return max(abs(d.q), abs(d.r), abs(d.s))
+    
+    def neighbors(self) -> list[Hex]:
+        return [self + d for d in AXIAL_DIRECTIONS]
 
 
 """
