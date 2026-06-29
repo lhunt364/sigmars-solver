@@ -34,6 +34,10 @@ class Hex:
     
     def neighbors(self) -> list[Hex]:
         return [self + d for d in AXIAL_DIRECTIONS]
+    
+    def neighbor(self, direction: int) -> Hex:
+        return self + AXIAL_DIRECTIONS[direction % 6]
+
 
 
 """
