@@ -78,19 +78,39 @@ class GameState:
         """
         Lists every currently legal move
         """
-        pass
+        moves: list[Move] = []
+        unblocked_marbles = list(self.board.unblocked())
+
+        # check for unblocked gold if gold is current metal in sequence
+        if self.current_metal == TileType.GOLD:
+            moves.extend(Move.single(h) for h, t in unblocked_marbles if t is TileType.GOLD)
+
+        # check every pair of unblocked marbles for legal moves
+        for i in range(len(unblocked_marbles)):
+            hex_i, type_i = unblocked_marbles[i]
+            for j in range(i + 1, len(unblocked_marbles)):
+                hex_j, type_j = unblocked_marbles[j]
+                if is_pair_match(type_i, type_j, self.current_metal):
+                    moves.append(Move.pair(hex_i, hex_j))
+        return moves
 
     def apply(self, move: Move) -> _Undo:
         """
         Applies the given move, emptying the given cells and advancing the current metal index if a metal was removed
         """
-        pass
+        old_pairs = [(h, self.board.remove(h)) for h in move.hexes]
+        undo = _Undo(old_pairs, self._current_metal_index)
+        if any(t is self._current_metal_index for _, t in old_pairs):
+            self._current_metal_index += 1
+        return undo
 
     def undo(self, receipt: _Undo) -> None:
         """
         Undoes the move corresponding to the given receipt information
         """
-        pass
+        for h, t in receipt.removed:
+            self.board.place(h, t)
+        self._current_metal_index = receipt.metal_index
 
     def is_complete(self) -> bool:
         """

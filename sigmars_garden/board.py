@@ -155,7 +155,7 @@ class Board:
         nbrs = [self.is_non_blocking(n) for n in hex.neighbors()]
         for n in nbrs + nbrs: # wrap the neighbors so ..4501.. is continuous
             if n: # if cell is empty or off board then continue run, otherwise reset it
-                run = run + 1
+                run += 1
             else:
                 run = 0
             if run >= 3:
@@ -167,3 +167,15 @@ class Board:
         Returns the number of cells on the board that are not empty, or the number of marbles on the board
         """
         return sum(1 for t in self._cells.values() if t is not TileType.EMPTY)
+    
+    def non_empty(self) -> Iterator[tuple[Hex, TileType]]:
+        """
+        Returns (Hex, TileType) for each non-empty cell
+        """
+        return ((h, t) for h, t in self._cells.items() if t is not TileType.EMPTY)
+    
+    def unblocked(self) -> Iterator[tuple[Hex, TileType]]:
+        """
+        Returns (Hex, TileType) for each non-empty cell that is unblocked
+        """
+        return ((h, t) for h, t in self.non_empty() if self.is_unblocked(h))
