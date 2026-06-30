@@ -161,3 +161,9 @@ class Board:
             if run >= 3:
                 return True
         return False
+    
+    def non_empty_count(self) -> int:
+        """
+        Returns the number of cells on the board that are not empty, or the number of marbles on the board
+        """
+        return sum(1 for t in self._cells.values() if t is not TileType.EMPTY)
