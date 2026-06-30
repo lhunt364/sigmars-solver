@@ -122,3 +122,42 @@ class Board:
         self._cells: dict[Hex, TileType] = {
             h: TileType.EMPTY for h in hexagonal_grid(radius)
         }
+
+    def place(self, hex: Hex, tile: TileType) -> None:
+        if hex not in self._cells:
+            raise ValueError(f"{hex} is outside of board")
+        self._cells[hex] = tile
+    
+    def remove(self, hex: Hex) -> TileType:
+        """
+        Empties given cell and returns the type of tile that was there
+        """
+        if hex not in self._cells:
+            raise ValueError(f"{hex} is outside of board")
+        old_type = self._cells[hex]
+        self._cells[hex] = TileType.EMPTY
+        return old_type
+    
+    def is_empty(self, hex: Hex) -> bool:
+        return self._cells[hex] is TileType.EMPTY
+    
+    def is_non_blocking(self, hex: Hex) -> bool:
+        """
+        Returns true if the cell is empty or if it's off the board
+        """
+        return self._cells.get(hex, TileType.EMPTY) is TileType.EMPTY
+    
+    def is_unblocked(self, hex: Hex) -> bool:
+        """
+        Checks if given cell has three consecutive empty neighboring cells and therefore is unblocked from being removed
+        """
+        run = 0
+        nbrs = [self.is_non_blocking(n) for n in hex.neighbors()]
+        for n in nbrs + nbrs: # wrap the neighbors so ..4501.. is continuous
+            if n: # if cell is empty or off board then continue run, otherwise reset it
+                run = run + 1
+            else:
+                run = 0
+            if run >= 3:
+                return True
+        return False
