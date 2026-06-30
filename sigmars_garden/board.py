@@ -42,7 +42,7 @@ class Hex:
 
 """
   3 4
-2  S  5
+2  0  5
   1 6
 The six axial directions as Hex's that can be added to a Hex to find cells 1 unit away in each direction.
 They are arranged in order, so consecutive entries correspond to consecutive neighboring cells.
@@ -96,3 +96,29 @@ METAL_SEQUENCE: tuple[TileType, ...] = (
     TileType.SILVER,
     TileType.GOLD
 )
+
+
+def hexagonal_grid(radius: int):
+    """
+    Yields each hexagon (Hex) in a hexagonal grid of given radius centered on (0, 0)
+    """
+    for q in range(-radius, radius + 1):
+        # r is constrained by |r| <= radius, so -radius <= r <= radius
+        # also |s| <= radius, s=-q-r so |-q-r| <= radius so -radius <= -q - r <= radius, or radius - q >= r >= -radius - q
+        r_min = max(-radius, -radius - q)
+        r_max = max(radius, radius - q)
+        for r in range(r_min, r_max + 1):
+            yield Hex(q, r)
+
+
+
+class Board:
+    """
+    Represents a board state, mapping cells to tile types.
+    Sigmar's Garden has a radius of 5, so that is the default.
+    """
+
+    def __init__(self, radius: int = 5) -> None:
+        self._cells: dict[Hex, TileType] = {
+            h: TileType.EMPTY for h in hexagonal_grid(radius)
+        }
